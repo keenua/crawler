@@ -4,12 +4,13 @@ defmodule Crawler.Fetcher.Modifier do
   """
 
   defmodule Spec do
-    @type url    :: String.t
-    @type header :: {String.t, String.t}
-    @type opts   :: map
+    @type url        :: String.t
+    @type header     :: {String.t, String.t}
+    @type opts       :: map
+    @type fetch_opts :: map
 
-    @callback headers(opts) :: list(header) | []
-    @callback opts(opts)    :: keyword | []
+    @callback headers(opts, fetch_opts) :: list(header) | []
+    @callback opts(opts)                :: keyword | []
   end
 
   @behaviour __MODULE__.Spec
@@ -26,7 +27,7 @@ defmodule Crawler.Fetcher.Modifier do
         []
       end
   """
-  def headers(_opts), do: []
+  def headers(_opts, _fetch_opts), do: []
 
   @doc """
   Allows passing opts to httpPoison prior to making the crawl request

@@ -19,11 +19,25 @@ defmodule Crawler.Fetcher.Requester do
       {:error, %HTTPoison.Error{id: nil, reason: :nxdomain}}
   """
   def make(opts) do
-    HTTP.get(opts[:url], fetch_headers(opts), fetch_opts(opts))
+    fetch_options = fetch_opts(opts) ++ [url: opts[:url]]
+    headers = fetch_headers(opts, fetch_options)
+
+    res = HTTP.get(opts[:url], headers, fetch_options)
+
+    case res do
+      {:ok, %HTTPoison.Response{status_code: 200}} ->
+        opts[:reporter].report_success(fetch_options)
+      {:ok, %HTTPoison.Response{status_code: status_code}} ->
+        opts[:reporter].report_fail(fetch_options, "Non-200 status code", status_code)
+      {:error, %HTTPoison.Error{reason: reason}} ->
+        opts[:reporter].report_fail(fetch_options, reason, 0)
+    end
+
+    res
   end
 
-  defp fetch_headers(opts) do
-    [{"User-Agent", opts[:user_agent]}] ++ opts[:modifier].headers(opts)
+  defp fetch_headers(opts, fetch_options) do
+    [{"User-Agent", opts[:user_agent]}] ++ opts[:modifier].headers(opts, fetch_options)
   end
 
   defp fetch_opts(opts) do
