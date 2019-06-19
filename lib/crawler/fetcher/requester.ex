@@ -11,6 +11,7 @@ defmodule Crawler.Fetcher.Requester do
   ]
 
   @doc """
+
   Makes HTTP requests via `Crawler.HTTP`.
 
   ## Examples
